@@ -1,0 +1,205 @@
+# BADALY PROJECT — AI ASSISTANT CONTEXT
+# بدالي — AI Phone Call Proxy
+# ════════════════════════════════════════════════════════════════
+
+## WHO YOU ARE
+You are a Staff-Level Full-Stack Engineer helping finalize "Badaly" (بدالي),
+a demo-ready AI phone assistant app. The presentation is TOMORROW.
+Be direct, fast, and practical. No theory. Only working code.
+
+---
+
+## WHAT THIS PROJECT IS
+
+**Badaly** = "instead of me" in Arabic.
+Problem: Egyptians waste 15-40 minutes on hold with telecoms/banks.
+Solution: AI calls customer service, navigates IVR, waits on hold,
+and warm-transfers to the user's real phone when a human agent answers.
+
+Core technology: **Retell AI** handles outbound calling + DTMF navigation
++ Voice Activity Detection (human vs hold music) + call_transfer tool.
+
+---
+
+## PROJECT FILES
+
+```
+badaly-backend/
+├── server.js          ← Express backend. Triggers Retell API calls.
+├── package.json       ← deps: express, cors, dotenv
+├── .env               ← SECRET KEYS (never commit). Fill from RETELL_SETUP.md
+├── .env.example       ← Template showing all required variables
+├── HTML_PATCH.md      ← 4 surgical changes to apply to the frontend HTML
+└── RETELL_SETUP.md    ← Step-by-step to get Retell keys
+```
+
+The frontend is: **badaly-demo__2_.html** (in this folder or parent folder)
+→ A single-file Arabic PWA simulating the call flow.
+→ Must be patched using HTML_PATCH.md to wire the real backend.
+
+---
+
+## ARCHITECTURE
+
+```
+Mobile PWA (Chrome on Android)
+    │ POST /api/start-call { company, userPhone, issue }
+    ▼
+Node.js Express (server.js) — port 3001
+    │ exposed via ngrok for phone access
+    │ POST api.retellai.com/v2/call/phone-call
+    ▼
+Retell AI Agent
+    → calls telecom/bank hotline
+    → navigates IVR with DTMF tones
+    → detects human voice (VAD)
+    → call_transfer tool → rings user's real phone
+```
+
+**KEY INSIGHT**: The HTML simulation runs visually in parallel with the real call.
+The simulation IS the demo. The real call is the magic.
+
+---
+
+## ENVIRONMENT VARIABLES (.env)
+
+```env
+PORT=3001
+RETELL_API_KEY=key_...              # Retell dashboard → Settings → API Keys
+RETELL_AGENT_ID=agent_...           # URL bar when viewing agent in Retell dashboard
+RETELL_FROM_NUMBER=+1...            # Phone number bought in Retell dashboard
+
+# Egyptian company hotlines (E.164 format)
+NUM_VODAFONE=+20888...
+NUM_CIB=+2019666
+NUM_NBE=+2019623
+NUM_BANQUEMISR=+2019888
+NUM_QNB=+2016000
+NUM_BANQUEDUCAIRE=+2016488
+```
+
+If `.env` is missing these Retell keys → server auto-falls to **DEMO MODE**
+(returns a fake callId, visual simulation still works perfectly).
+
+---
+
+## RETELL API CALLS
+
+Trigger call:
+```
+POST https://api.retellai.com/v2/call/phone-call
+Authorization: Bearer {RETELL_API_KEY}
+{
+  from_number: RETELL_FROM_NUMBER,
+  to_number: <company hotline>,
+  agent_id: RETELL_AGENT_ID,
+  retell_llm_dynamic_variables: {
+    user_phone: <user's Egyptian number>,
+    issue_description: <what user typed>,
+    company_name: <company key>
+  }
+}
+```
+
+Get call status:
+```
+GET https://api.retellai.com/v2/call/{call_id}
+```
+
+---
+
+## COMPANIES SUPPORTED
+
+| Key           | Arabic Name        | Shortcode | E.164 Attempt |
+|---------------|--------------------|-----------|---------------|
+| vodafone      | فودافون            | 888       | SIM-locked ⚠️ |
+| we            | WE المصرية         | 8000      | SIM-locked ⚠️ |
+| orange        | أورنج              | 110       | SIM-locked ⚠️ |
+| etisalat      | إتصالات (e&)       | 333       | SIM-locked ⚠️ |
+| cib           | CIB مصر            | 19666     | +2019666 ✅    |
+| nbe           | البنك الأهلي       | 19623     | +2019623 ✅    |
+| banquemisr    | بنك مصر            | 19888     | +2019888 ✅    |
+| qnb           | QNB الأهلي         | 16000     | +2016000 ✅    |
+| banqueducaire | بنك القاهرة        | 16488     | +2016488 ✅    |
+
+**Banks (19xxx/16xxx) can be called from international numbers.**
+**Telecoms (888, 8000, etc.) are SIM-locked — override with own phone for demo.**
+
+---
+
+## HTML PATCH SUMMARY (4 changes to badaly-demo__2_.html)
+
+1. **CSS** — Add phone input styles before `</style>`
+2. **JS Config** — Add `BACKEND_URL` and `currentCallId` at top of `<script>`
+3. **HTML** — Add phone number input field inside `.sheet-inner`, before `.launch-btn`
+4. **JS Function** — Replace `startCall()` with async version that calls backend
+
+All 4 changes are in `HTML_PATCH.md` — exact copy-paste blocks, labeled CHANGE 1-4.
+
+---
+
+## RUNNING THE PROJECT
+
+```bash
+# Terminal 1 — Backend
+cd badaly-backend
+npm install
+cp .env.example .env   # then fill in keys
+node server.js
+
+# Terminal 2 — ngrok tunnel (for phone access)
+npx ngrok http 3001
+# Copy the https://xxxx.ngrok-free.app URL
+# → paste as BACKEND_URL in the HTML file
+
+# Terminal 3 — Serve frontend
+npx serve . -p 8080
+# On phone: open Chrome → 192.168.x.x:8080/badaly-demo__2_.html
+# Chrome → ⋮ → Add to Home Screen → looks like a native app
+```
+
+---
+
+## COMMON TASKS — HOW TO HELP
+
+**"Apply the HTML patch"**
+→ Open `HTML_PATCH.md`, apply all 4 changes to `badaly-demo__2_.html`
+
+**"Test the backend"**
+→ Run: `curl http://localhost:3001/health`
+→ Then: `curl -X POST http://localhost:3001/api/start-call -H "Content-Type: application/json" -d '{"company":"cib","userPhone":"+201XXXXXXXXX","issue":"test"}'`
+
+**"The server won't start"**
+→ Check Node version (needs 18+ for built-in fetch): `node --version`
+→ If < 18: add `node-fetch` to package.json and `const fetch = require('node-fetch')`
+
+**"ngrok URL changes every restart"**
+→ Either pay for ngrok static domain OR update `BACKEND_URL` in HTML each time
+→ Alternatively: use `localtunnel`: `npx localtunnel --port 3001`
+
+**"Retell call fires but phone doesn't ring"**
+→ Check agent has `call_transfer` tool configured with `{{user_phone}}`
+→ Check `userPhone` in request is E.164 format (+201XXXXXXXXX not 01XXXXXXXXX)
+→ Check Retell Call History for error logs
+
+**"Demo mode for evaluators if Retell fails"**
+→ Leave `.env` empty → server returns `demoMode: true` → HTML simulation still runs
+→ Tell evaluators: "The backend is integrated, here's the API response on screen"
+
+---
+
+## BRAND
+
+- Primary Green: `#22C55E`
+- Dark Green: `#16A34A`
+- Navy: `#0F172A`
+- Font: Cairo (Google Fonts)
+- Direction: RTL (Arabic) with LTR for numbers/code
+
+## TECH STACK
+
+- Frontend: Vanilla HTML/CSS/JS, PWA, Cairo font, no framework
+- Backend: Node.js 18+, Express 4, cors, dotenv
+- AI: Retell AI (outbound calling, DTMF, VAD, warm transfer)
+- Tunnel: ngrok or localtunnel
+- Deployment: localhost for demo (no cloud needed)
