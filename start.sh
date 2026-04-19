@@ -3,7 +3,7 @@
 # ║         BADALY — ONE-COMMAND DEMO LAUNCHER       ║
 # ╚══════════════════════════════════════════════════╝
 
-HTML_FILE="badaly.html"
+HTML_FILE="index.html"
 BACKEND_DIR="badaly-backend"
 PORT=3001
 FRONTEND_PORT=8080
