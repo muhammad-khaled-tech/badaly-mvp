@@ -1,0 +1,390 @@
+{
+  "agent_id": "",
+  "channel": "voice",
+  "last_modification_timestamp": 1776623499250,
+  "agent_name": "Badaly IVR Agent — بدالي",
+  "response_engine": {
+    "type": "conversation-flow",
+    "version": 4,
+    "conversation_flow_id": "conversation_flow_f2fcc8da40a7"
+  },
+  "language": "ar-SA",
+  "data_storage_setting": "everything",
+  "opt_in_signed_url": false,
+  "end_call_after_silence_ms": 32000,
+  "version": 4,
+  "is_published": true,
+  "version_title": "",
+  "post_call_analysis_model": "gpt-4.1",
+  "pii_config": {
+    "mode": "post_call",
+    "categories": []
+  },
+  "handbook_config": {
+    "echo_verification": false,
+    "speech_normalization": true,
+    "default_personality": true,
+    "scope_boundaries": true,
+    "natural_filler_words": false,
+    "nato_phonetic_alphabet": false,
+    "high_empathy": false,
+    "ai_disclosure": false,
+    "smart_matching": true
+  },
+  "post_call_analysis_data": [
+    {
+      "type": "boolean",
+      "name": "human_reached",
+      "description": "Did the agent successfully reach a human customer service agent?"
+    },
+    {
+      "type": "boolean",
+      "name": "transfer_announced",
+      "description": "Did the agent announce the transfer to the user?"
+    }
+  ],
+  "voice_id": "retell-Cimo",
+  "max_call_duration_ms": 3600000,
+  "interruption_sensitivity": 0.9,
+  "normalize_for_speech": true,
+  "stt_mode": "accurate",
+  "allow_user_dtmf": true,
+  "user_dtmf_options": {},
+  "denoising_mode": "noise-and-background-speech-cancellation",
+  "conversationFlow": {
+    "conversation_flow_id": "conversation_flow_f2fcc8da40a7",
+    "version": 4,
+    "global_prompt": "## دورك — بدالي\nأنت **بدالي**، نظام ذكاء اصطناعي بيتصل بخدمة عملاء البنوك والشركات نيابةً عن مستخدم.\n**الوقت الحالي:** {{currentTime}}\n---\n## مهمتك بالترتيب\n1. تنقل في قائمة الـ IVR للوصول لموظف بشري حقيقي\n2. استنى بصمت تام أثناء موسيقى الانتظار\n3. لما الموظف البشري يرد — قوله الجملة المحددة وبعدين حوّل المكالمة\n---\n## قواعد الصمت أثناء الانتظار\nلو سمعت أي حاجة من دي:\n- موسيقى انتظار\n- \"لحظة من فضلك\" أو \"استنى\"\n- \"please wait\" أو \"one moment\" أو \"next available\"\n- أي صمت بعد اختيار رقم\nاستجب بالضبط: `NO_RESPONSE_NEEDED`\n---\n## الشركة والمشكلة\n**الشركة المتصل بها:** {{company_name}}\n**مشكلة المستخدم:** {{issue_description}}\n**رقم المستخدم للتحويل:** {{user_phone}}\n---\n## خطوات التنقل في الـ IVR — Bank of America\nاتبع الخطوات دي بالترتيب بعد ما المكالمة تتصل:\n**الخطوة 1:** لو سمعت اختيار اللغة (\"for English press 1\") → اضغط **1**\n**الخطوة 2:** لو سمعت قائمة فيها \"checking\", \"savings\", \"credit card\", \"account\" → اضغط **0**\n**الخطوة 3:** لو سمعت \"please enter your account number\" أو \"enter your card number\" → اضغط **0**\n**الخطوة 4:** لو سمعت \"for all other questions\" أو \"other options\" → اضغط ذلك الرقم\n**الخطوة 5:** لو في أي وقت سمعت \"would you like to speak to a representative?\" → اضغط **1** أو قول \"yes\"\n**القاعدة العامة:** لو مش عارف تضغط إيه → اضغط **0** أو قول \"representative\"\n---\n## لما الموظف البشري يرد\nهتعرف إنه موظف بشري لو:\n- قالك \"Thank you for calling Bank of America, my name is...\"\n- أو بدأ يتكلم بطريقة طبيعية مش مسجلة\n- أو سألك \"How can I help you today?\"\n**قوله على طول:**\n\"Hi, I'm calling on behalf of a customer. Could you please hold for just one moment while I connect them? Thank you.\"\n**بعدين على طول:** استخدم أداة التحويل عشان تحوّل المكالمة لـ {{user_phone}}\n---\n## ملاحظات مهمة\n- **لا تتكلم أبداً** أثناء موسيقى الانتظار\n- **لا تقول أي حاجة** لو مش متأكد إن في حد بشري رد\n- لو سمعت \"your call is very important to us\" → ده مسجل، استنى\n- لو سمعت اسم شخص حقيقي وبيسألك \"how can I help\" → ده الموظف البشري",
+    "nodes": [
+      {
+        "name": "End Call — Success",
+        "id": "node-end-success",
+        "type": "end",
+        "speak_during_execution": true,
+        "display_position": {
+          "x": 1686,
+          "y": 6
+        },
+        "instruction": {
+          "type": "static_text",
+          "text": "شكراً، مع السلامة."
+        }
+      },
+      {
+        "name": "End Call — Failed",
+        "id": "node-end-failed",
+        "type": "end",
+        "speak_during_execution": false,
+        "display_position": {
+          "x": 1134,
+          "y": 174
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "أنهي المكالمة بدون كلام."
+        }
+      },
+      {
+        "instruction": {
+          "type": "static_text",
+          "text": "NO_RESPONSE_NEEDED"
+        },
+        "name": "Hold — Silence",
+        "global_node_setting": {
+          "go_back_conditions": [
+            {
+              "id": "go-back-hold-badaly",
+              "transition_condition": {
+                "type": "prompt",
+                "prompt": "A live representative or IVR resumes speaking — hold has ended"
+              }
+            }
+          ],
+          "condition": "- Hold music is playing\n- The IVR or agent says wait, hold on, one moment, لحظة, استنى\n- Line goes silent after pressing a digit\n- Any automated announcement during hold"
+        },
+        "edges": [],
+        "id": "node-hold-silence",
+        "type": "conversation",
+        "display_position": {
+          "x": 6,
+          "y": 500
+        }
+      },
+      {
+        "component_type": "local",
+        "component_id": "cf-component-ivr-badaly",
+        "else_edge": {
+          "destination_node_id": "node-end-failed",
+          "id": "ivr-component-else-edge",
+          "transition_condition": {
+            "type": "prompt",
+            "prompt": "Else"
+          }
+        },
+        "name": "IVR Navigation + First Human Interaction",
+        "edges": [
+          {
+            "destination_node_id": "node-transfer-announce",
+            "id": "edge-human-reached",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "A real human agent answered and acknowledged"
+            }
+          },
+          {
+            "destination_node_id": "node-end-failed",
+            "id": "edge-ivr-failed",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Wrong number, voicemail, after-hours, or IVR cannot be navigated"
+            }
+          }
+        ],
+        "id": "component-node-ivr-badaly",
+        "type": "component",
+        "display_position": {
+          "x": 558,
+          "y": 6
+        }
+      },
+      {
+        "name": "Announce Transfer",
+        "edges": [
+          {
+            "destination_node_id": "node-1776612959168",
+            "id": "edge-transfer-done",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Agent responded or acknowledged — proceed to end"
+            }
+          }
+        ],
+        "id": "node-transfer-announce",
+        "type": "conversation",
+        "display_position": {
+          "x": 918,
+          "y": -450
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "قول للموظف بالضبط:\n\n> \"أهلاً، أنا نظام بدالي الذكي. بكلمك نيابة عن عميل عايز يتكلم بخصوص {{issue_description}}. هحوله ليك دلوقتي.\"\n\nاستنى ثانيتين بعد ما يردوا، وبعدين استخدم أداة `transfer_call` لتحويل المكالمة لرقم {{user_phone}}.\n\nلو مكنتش تقدر تحول، أنهي المكالمة بأدب."
+        }
+      },
+      {
+        "custom_sip_headers": {},
+        "transfer_destination": {
+          "type": "predefined",
+          "number": "{{user_phone}}"
+        },
+        "edge": {
+          "destination_node_id": "node-end-success",
+          "id": "edge-1776612959168-0pgfembjr",
+          "transition_condition": {
+            "type": "prompt",
+            "prompt": "Transfer failed"
+          }
+        },
+        "name": "Transfer Call",
+        "ignore_e164_validation": false,
+        "id": "node-1776612959168",
+        "transfer_option": {
+          "type": "cold_transfer",
+          "show_transferee_as_caller": false,
+          "enable_bridge_audio_cue": true
+        },
+        "type": "transfer_call",
+        "speak_during_execution": false,
+        "display_position": {
+          "x": 1278,
+          "y": -90
+        }
+      }
+    ],
+    "components": [
+      {
+        "start_node_id": "node-ivr-listen",
+        "nodes": [
+          {
+            "name": "Listen to IVR",
+            "edges": [
+              {
+                "destination_node_id": "node-ivr-press",
+                "id": "edge-listen-to-press",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "IVR presents a numbered DTMF menu — press a digit"
+                }
+              },
+              {
+                "destination_node_id": "ivr-exit-success",
+                "id": "edge-listen-to-success",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "A real human customer service agent answered"
+                }
+              },
+              {
+                "destination_node_id": "ivr-exit-failed",
+                "id": "edge-listen-to-failure",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "After-hours message, wrong number, voicemail, or IVR loops 3+ times"
+                }
+              }
+            ],
+            "id": "node-ivr-listen",
+            "type": "conversation",
+            "display_position": {
+              "x": -600,
+              "y": 200
+            },
+            "instruction": {
+              "type": "prompt",
+              "text": "المكالمة اتصلت دلوقتي. الـ IVR هيتكلم الأول — استنى ومتكلمش.\n\nتنقل نحو:\n- خدمة العملاء\n- الأفراد\n- شكاوى\n- تحدث مع موظف\n- الحسابات\n\nابعد عن:\n- الرصيد الآلي فقط\n- الفاكس\n- الدعم التقني الآلي\n- ترك رسالة صوتية\n\nلو الـ IVR قال \"اضغط 1 لـ كذا\" — انتقل لنود الضغط.\nلو موظف بشري رد — انتقل لنود النجاح.\nلو في أي انتظار أو موسيقى — `NO_RESPONSE_NEEDED`\n\n<*استنى الـ IVR يتكلم*>"
+            }
+          },
+          {
+            "delay_ms": 800,
+            "instruction": {
+              "type": "prompt",
+              "text": "اضغط الرقم اللي بيوديك لـ خدمة العملاء أو الأفراد أو شكاوى.\n\nأولويات الاختيار:\n- خدمة العملاء — اضغط الرقم المقابل\n- الأفراد — اضغط الرقم المقابل\n- شكاوى أو تواصل مع موظف — اضغط الرقم المقابل\n- اللغة العربية (لو طلبوا تحديد اللغة) — اضغط 1 عادةً\n\nابعد عن: الرصيد الآلي، الفاكس، الدعم التقني الآلي.\n\nلو مش عارف — اضغط 0 أو اضغط * للوصول لموظف."
+            },
+            "name": "Press IVR Digit",
+            "edges": [
+              {
+                "destination_node_id": "node-ivr-listen",
+                "id": "edge-press-to-listen",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "IVR presents another menu after pressing"
+                }
+              },
+              {
+                "destination_node_id": "node-ivr-human-greeting",
+                "id": "edge-press-to-human",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "A live human agent answered"
+                }
+              },
+              {
+                "destination_node_id": "ivr-exit-success",
+                "id": "edge-press-to-success",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "Reached the correct department and human is ready"
+                }
+              },
+              {
+                "destination_node_id": "ivr-exit-failed",
+                "id": "edge-press-to-failure",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "After-hours, wrong number, voicemail, or stuck in IVR loop"
+                }
+              }
+            ],
+            "id": "node-ivr-press",
+            "type": "press_digit",
+            "display_position": {
+              "x": 100,
+              "y": 0
+            }
+          },
+          {
+            "name": "Greet Human Agent",
+            "edges": [
+              {
+                "destination_node_id": "ivr-exit-success",
+                "id": "edge-greeting-to-success",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "Human agent responded or acknowledged"
+                }
+              },
+              {
+                "destination_node_id": "ivr-exit-failed",
+                "id": "edge-greeting-to-failed",
+                "transition_condition": {
+                  "type": "prompt",
+                  "prompt": "Wrong department or cannot help"
+                }
+              }
+            ],
+            "id": "node-ivr-human-greeting",
+            "type": "conversation",
+            "display_position": {
+              "x": 700,
+              "y": 100
+            },
+            "instruction": {
+              "type": "prompt",
+              "text": "لما موظف بشري يرد قول:\n\n> \"أهلاً، معايا استفسار بخصوص {{issue_description}} — ممكن تساعدني؟\"\n\nلو قالوا تمام أو ايوه — انتقل للنجاح.\nلو قالوا القسم الغلط — اطلب منهم يحولوك للقسم الصح."
+            }
+          },
+          {
+            "name": "Exit — Success",
+            "id": "ivr-exit-success",
+            "type": "end",
+            "display_position": {
+              "x": 1200,
+              "y": 100
+            },
+            "instruction": {
+              "type": "static_text",
+              "text": "Component completed"
+            }
+          },
+          {
+            "name": "Exit — Failed",
+            "id": "ivr-exit-failed",
+            "type": "end",
+            "display_position": {
+              "x": 1200,
+              "y": 350
+            },
+            "instruction": {
+              "type": "static_text",
+              "text": "Component completed"
+            }
+          }
+        ],
+        "user_modified_timestamp": 1776612134412,
+        "name": "IVR Navigation + First Human Interaction",
+        "conversation_flow_component_id": "cf-component-ivr-badaly",
+        "tools": [],
+        "flex_mode": true,
+        "begin_tag_display_position": {
+          "x": 6,
+          "y": 198
+        }
+      }
+    ],
+    "start_node_id": "component-node-ivr-badaly",
+    "start_speaker": "user",
+    "tools": [],
+    "model_choice": {
+      "type": "cascading",
+      "model": "gpt-4.1",
+      "high_priority": true
+    },
+    "tool_call_strict_mode": false,
+    "default_dynamic_variables": {
+      "user_phone": "+201000000000",
+      "issue_description": "استفسار عن رصيد الحساب",
+      "company_name": "CIB مصر"
+    },
+    "knowledge_base_ids": [],
+    "kb_config": {
+      "top_k": 3,
+      "filter_score": 0.6
+    },
+    "begin_tag_display_position": {
+      "x": 6,
+      "y": 30
+    },
+    "is_published": true,
+    "flex_mode": false,
+    "is_transfer_cf": false
+  }
+}
